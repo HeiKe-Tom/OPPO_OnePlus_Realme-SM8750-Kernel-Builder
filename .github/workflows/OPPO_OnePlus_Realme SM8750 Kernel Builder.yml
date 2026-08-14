@@ -1085,7 +1085,7 @@ jobs:
         | --- | --- |
         | 📦 内核版本 | **${FULL_VERSION:-未知}** |
         | 🎯 编译目标 | ${TARGET:-未知} |
-        | 📱 目标设备 | ${TARGET_DEVICE:-未知} |
+        | 📱 目标设备 | OPPO-OPlus-Realme-SM8750 Devices |
         | 🔐 KSU | ${KSU_TYPENAME:-未知} |
         | 🕐 编译时间 | ${TIME_FORM:-未知} |
         | 🏷️ Release | **${TAG_HEAD:-OPPO-OPlus-Realme-build}-${KERNEL_VERSION}.${SUB_VERSION}** |
