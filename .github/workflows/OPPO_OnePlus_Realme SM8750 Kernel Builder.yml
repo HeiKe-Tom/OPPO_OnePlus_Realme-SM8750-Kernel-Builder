@@ -579,24 +579,11 @@ jobs:
 
           '
       - name: 🏷️ 19 · 设置内核版本标识
-        run: |
-          cd kernel_workspace
-          echo "替换内核版本后缀..."
-          if [[ -n "${{ github.event.inputs.kernel_suffix }}" ]]; then
-            echo "当前内核版本后缀：${{ github.event.inputs.kernel_suffix }}"
-            for f in ./common/scripts/setlocalversion; do
-              sed -i "\$s|echo \"\\\$res\"|echo \"-${{ github.event.inputs.kernel_suffix }}\"|" "$f"
-            done
-            sudo sed -i 's/-4k/-${{ github.event.inputs.KERNEL_SUFFIX }}/g' ./common/arch/arm64/configs/gki_defconfig
-          else
-            echo "当前内核版本后缀：${{ env.KERNEL_NAME }}"
-            for f in ./common/scripts/setlocalversion; do
-              sed -i "\$s|echo \"\\\$res\"|echo \"-${{ env.KERNEL_NAME }}\"|" "$f"
-            done
-            sudo sed -i 's/-4k/-${{ env.KERNEL_NAME }}/g' ./common/arch/arm64/configs/gki_defconfig
-          fi
-          sed -i 's/${scm_version}//' ./common/scripts/setlocalversion
-          echo "CONFIG_LOCALVERSION_AUTO=n" >> ./common/arch/arm64/configs/gki_defconfig
+        run: "cd kernel_workspace\necho \"替换内核版本后缀...\"\nif [[ -n \"${{ inputs.kernel_suffix }}\" ]]; then\n  echo \"当前内核版本后缀：${{ inputs.kernel_suffix }}\"\n  for f in ./common/scripts/setlocalversion;\
+          \ do\n    sed -i \"\\$s|echo \\\"\\\\\\$res\\\"|echo \\\"-${{ inputs.kernel_suffix }}\\\"|\" \"$f\"\n  done\n  sudo sed -i 's/-4k/-${{ inputs.KERNEL_SUFFIX }}/g' ./common/arch/arm64/configs/gki_defconfig\n\
+          else\n  echo \"当前内核版本后缀：${{ env.KERNEL_NAME }}\"\n  for f in ./common/scripts/setlocalversion; do\n    sed -i \"\\$s|echo \\\"\\\\\\$res\\\"|echo \\\"-${{ env.KERNEL_NAME }}\\\"|\" \"$f\"\n  done\n\
+          \  sudo sed -i 's/-4k/-${{ env.KERNEL_NAME }}/g' ./common/arch/arm64/configs/gki_defconfig\nfi\nsed -i 's/${scm_version}//' ./common/scripts/setlocalversion\necho \"CONFIG_LOCALVERSION_AUTO=n\"\
+          \ >> ./common/arch/arm64/configs/gki_defconfig\n \n"
       - name: 🔨 20 · 编译内核
         run: 'WORKDIR="$(pwd)"
 
@@ -1101,7 +1088,7 @@ jobs:
         | 📱 目标设备 | ${TARGET_DEVICE:-未知} |
         | 🔐 KSU | ${KSU_TYPENAME:-未知} |
         | 🕐 编译时间 | ${TIME_FORM:-未知} |
-        | 🏷️ Release | **${TAG_HEAD:-OPPO-OPlus-Realme-build}-${FULL_VERSION:-未知}** |
+        | 🏷️ Release | **${TAG_HEAD:-OPPO-OPlus-Realme-build}-${KERNEL_VERSION}.${SUB_VERSION}** |
         | 🌿 分支 | \`${GITHUB_REF_NAME}\` |
         | 🔢 运行编号 | \`${GITHUB_RUN_NUMBER}\` |
         | 📝 提交 | \`${GITHUB_SHA}\` |
