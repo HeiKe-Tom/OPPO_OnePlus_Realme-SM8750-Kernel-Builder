@@ -111,6 +111,8 @@ env:
   ANDROID_VERSION: android15
   KERNEL_VERSION: '6.6'
   BUILDER_UI_VERSION: Professional Kernel Builder CN v3.0
+  KERNEL_NAME: 'android15-8-g29d86c5fc9dd-abogki428889875-4k'
+  CCACHE_KEY: ccache-ecsv4-6.6.118
   LANG: C.UTF-8
   LC_ALL: C.UTF-8
 
@@ -577,11 +579,24 @@ jobs:
 
           '
       - name: 🏷️ 19 · 设置内核版本标识
-        run: "cd kernel_workspace\necho \"替换内核版本后缀...\"\nif [[ -n \"${{ inputs.kernel_suffix }}\" ]]; then\n  echo \"当前内核版本后缀：${{ inputs.kernel_suffix }}\"\n  for f in ./common/scripts/setlocalversion;\
-          \ do\n    sed -i \"\\$s|echo \\\"\\\\\\$res\\\"|echo \\\"-${{ inputs.kernel_suffix }}\\\"|\" \"$f\"\n  done\n  sudo sed -i 's/-4k/-${{ inputs.KERNEL_SUFFIX }}/g' ./common/arch/arm64/configs/gki_defconfig\n\
-          else\n  echo \"当前内核版本后缀：${{ env.KERNEL_NAME }}\"\n  for f in ./common/scripts/setlocalversion; do\n    sed -i \"\\$s|echo \\\"\\\\\\$res\\\"|echo \\\"-${{ env.KERNEL_NAME }}\\\"|\" \"$f\"\n  done\n\
-          \  sudo sed -i 's/-4k/-${{ env.KERNEL_NAME }}/g' ./common/arch/arm64/configs/gki_defconfig\nfi\nsed -i 's/${scm_version}//' ./common/scripts/setlocalversion\necho \"CONFIG_LOCALVERSION_AUTO=n\"\
-          \ >> ./common/arch/arm64/configs/gki_defconfig\n \n"
+        run: |
+          cd kernel_workspace
+          echo "替换内核版本后缀..."
+          if [[ -n "${{ github.event.inputs.kernel_suffix }}" ]]; then
+            echo "当前内核版本后缀：${{ github.event.inputs.kernel_suffix }}"
+            for f in ./common/scripts/setlocalversion; do
+              sed -i "\$s|echo \"\\\$res\"|echo \"-${{ github.event.inputs.kernel_suffix }}\"|" "$f"
+            done
+            sudo sed -i 's/-4k/-${{ github.event.inputs.KERNEL_SUFFIX }}/g' ./common/arch/arm64/configs/gki_defconfig
+          else
+            echo "当前内核版本后缀：${{ env.KERNEL_NAME }}"
+            for f in ./common/scripts/setlocalversion; do
+              sed -i "\$s|echo \"\\\$res\"|echo \"-${{ env.KERNEL_NAME }}\"|" "$f"
+            done
+            sudo sed -i 's/-4k/-${{ env.KERNEL_NAME }}/g' ./common/arch/arm64/configs/gki_defconfig
+          fi
+          sed -i 's/${scm_version}//' ./common/scripts/setlocalversion
+          echo "CONFIG_LOCALVERSION_AUTO=n" >> ./common/arch/arm64/configs/gki_defconfig
       - name: 🔨 20 · 编译内核
         run: 'WORKDIR="$(pwd)"
 
