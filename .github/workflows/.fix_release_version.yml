@@ -1,0 +1,152 @@
+name: 🔧 Temporary · 修复 Release 版本信息
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛠️ 修复 Release 版本号、标题与构建摘要
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const path = '.github/workflows/OPPO_OnePlus_Realme SM8750 Kernel Builder.yml';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branch = 'main';
+            const { data: file } = await github.rest.repos.getContent({ owner, repo, path, ref: branch });
+            const sha = file.sha;
+            let text = Buffer.from(file.content, 'base64').toString('utf8');
+            const releasePos = text.indexOf('\n  release:\n');
+            if (releasePos < 0) { core.setFailed('找不到 release Job'); return; }
+            const before = text.slice(0, releasePos);
+            let release = text.slice(releasePos);
+
+            const step02Re = /    - name: 🏷️ 02 · 生成发布信息\n.*?(?=    - name: 🚀 03 · 创建 GitHub Release)/s;
+            const step02 = [
+              '    - name: 🏷️ 02 · 生成发布信息',
+              '      shell: bash',
+              '      run: |',
+              '        set -euo pipefail',
+              '',
+              '        SUB_VERSION="${{ needs.build.outputs.sub_version }}"',
+              '        TARGET="${{ needs.build.outputs.target }}"',
+              '        TARGET_DEVICE="${{ needs.build.outputs.target_device }}"',
+              '',
+              '        if [[ -z "$SUB_VERSION" ]]; then',
+              '          echo "❌ 无法获取内核子版本号：needs.build.outputs.sub_version 为空"',
+              '          exit 1',
+              '        fi',
+              '',
+              '        if [[ -n "${{ inputs.kernel_suffix }}" ]]; then',
+              '          FULL_VERSION="${KERNEL_VERSION}.${SUB_VERSION}-${{ inputs.kernel_suffix }}"',
+              '        else',
+              '          FULL_VERSION="${KERNEL_VERSION}.${SUB_VERSION}"',
+              '        fi',
+              '',
+              '        TIME="$(TZ=\'Asia/Shanghai\' date +\'%y%m%d%H%M%S\')"',
+              '        TIME_FORM="$(TZ=\'Asia/Shanghai\' date +\'%Y-%m-%d %H:%M:%S\')"',
+              '        TAG_HEAD="OPPO-OPlus-Realme-build"',
+              '',
+              '        case "${{ inputs.ksu_type }}" in',
+              '          sukisu) KSU_TYPENAME="SukiSU Ultra" ;;',
+              '          resukisu) KSU_TYPENAME="ReSukiSU" ;;',
+              '          ksunext) KSU_TYPENAME="KernelSU Next" ;;',
+              '          ksu) KSU_TYPENAME="KSU" ;;',
+              '          *) KSU_TYPENAME="无内置KSU" ;;',
+              '        esac',
+              '',
+              '        {',
+              '          echo "FULL_VERSION=$FULL_VERSION"',
+              '          echo "TIME=$TIME"',
+              '          echo "TIME_FORM=$TIME_FORM"',
+              '          echo "TAG_HEAD=$TAG_HEAD"',
+              '          echo "KSU_TYPENAME=$KSU_TYPENAME"',
+              '          echo "TARGET=$TARGET"',
+              '          echo "TARGET_DEVICE=$TARGET_DEVICE"',
+              '        } >> "$GITHUB_ENV"',
+              '',
+              '        echo "📦 内核版本：$FULL_VERSION"',
+              '        echo "🎯 编译目标：$TARGET"',
+              '        echo "📱 目标设备：$TARGET_DEVICE"',
+              '        echo "🕐 编译时间：$TIME_FORM"',
+              '        echo "🔐 KSU：$KSU_TYPENAME"',
+              ''
+            ].join('\n');
+            if (!step02Re.test(release)) { core.setFailed('找不到 Release 02 步骤'); return; }
+            release = release.replace(step02Re, step02);
+
+            release = release.replaceAll('${{ env.SUB_VERSION }}', '${{ needs.build.outputs.sub_version }}');
+            release = release.replaceAll('${{ env.KERNEL_NAME }}', '');
+
+            const step04Re = /    - name: 📊 04 · 生成发布摘要\n.*?(?=    timeout-minutes: 30)/s;
+            const step04 = [
+              '    - name: 📊 04 · 生成发布摘要',
+              '      if: always()',
+              '      shell: bash',
+              '      run: |',
+              '        set -u',
+              '        echo ""',
+              '        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"',
+              '        echo "📊 04 · 发布摘要"',
+              '        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"',
+              '        echo "▶ 工作流：${GITHUB_WORKFLOW}"',
+              '        echo "▶ 分支：${GITHUB_REF_NAME}"',
+              '        echo "▶ 运行编号：${GITHUB_RUN_NUMBER}"',
+              '        echo "▶ 内核版本：${FULL_VERSION:-${KERNEL_VERSION}.${{ needs.build.outputs.sub_version }}}"',
+              '        echo "▶ 编译目标：${TARGET:-${{ needs.build.outputs.target }}}"',
+              '        echo "▶ 目标设备：${TARGET_DEVICE:-${{ needs.build.outputs.target_device }}}"',
+              '        echo "▶ KSU：${KSU_TYPENAME:-未知}"',
+              '        echo "▶ 提交：${GITHUB_SHA}"',
+              '',
+              '        {',
+              '          echo "## 🚀 发布任务摘要"',
+              '          echo ""',
+              '          echo "| 项目 | 信息 |"',
+              '          echo "| --- | --- |"',
+              '          echo "| 内核版本 | **${FULL_VERSION:-${KERNEL_VERSION}.${{ needs.build.outputs.sub_version }}}** |"',
+              '          echo "| 编译目标 | ${{ needs.build.outputs.target }} |"',
+              '          echo "| 目标设备 | ${{ needs.build.outputs.target_device }} |"',
+              '          echo "| KSU | ${KSU_TYPENAME:-未知} |"',
+              '          echo "| 工作流 | `${GITHUB_WORKFLOW}` |"',
+              '          echo "| 分支 | `${GITHUB_REF_NAME}` |"',
+              '          echo "| 运行编号 | `${GITHUB_RUN_NUMBER}` |"',
+              '          echo "| 提交 | `${GITHUB_SHA}` |"',
+              '        } >> "$GITHUB_STEP_SUMMARY"',
+              ''
+            ].join('\n');
+            if (!step04Re.test(release)) { core.setFailed('找不到 Release 04 步骤'); return; }
+            release = release.replace(step04Re, step04);
+
+            if (release.includes('${{ env.SUB_VERSION }}') || release.includes('${{ env.KERNEL_NAME }}')) {
+              core.setFailed('Release Job 仍存在旧变量引用'); return;
+            }
+            if (!release.includes('${{ needs.build.outputs.sub_version }}')) {
+              core.setFailed('Release Job 未正确引用 build 输出'); return;
+            }
+
+            const updated = before + release;
+            await github.rest.repos.createOrUpdateFileContents({
+              owner, repo, path,
+              message: 'fix: 修复 Release 内核版本号与构建摘要 [skip ci]',
+              content: Buffer.from(updated, 'utf8').toString('base64'),
+              sha,
+              branch,
+            });
+            core.info('✅ Release 主文件已更新。');
+
+            const tempPath = '.github/workflows/.fix_release_version.yml';
+            const { data: tempFile } = await github.rest.repos.getContent({ owner, repo, path: tempPath, ref: branch });
+            await github.rest.repos.deleteFile({
+              owner, repo, path: tempPath,
+              message: 'chore: remove temporary release fix workflow [skip ci]',
+              sha: tempFile.sha, branch,
+            });
+            core.info('✅ 临时 Workflow 已删除。');
