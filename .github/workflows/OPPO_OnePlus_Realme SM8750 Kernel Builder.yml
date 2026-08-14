@@ -978,7 +978,7 @@ jobs:
         - **内核版本号**: ${FULL_VERSION}
         - **编译时间**: ${TIME_FORM}
         - **编译目标**: ${TARGET}
-        - **目标设备**: ${TARGET_DEVICE}
+        - **目标设备**: OPPO-OPlus-Realme-SM8750 Devices
         - **KSU分支**: ${KSU_TYPENAME}
 
         ### 🧩 内核功能
@@ -996,10 +996,10 @@ jobs:
 
         ### 🔐 KSU 管理器
 
-        - ReSukiSU 管理器
-        - SukiSU Ultra 管理器
-        - KernelSU Next 管理器
-        - KernelSU 原版管理器
+        - ReSukiSU管理器下载：[ReSukiSU_CI](https://github.com/cctv18/ReSukiSU_CI/releases)
+        - SukiSU Ultra管理器下载：[SukiSU-Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra/releases)
+        - KernelSU Next管理器下载：[KernelSU-Next](https://github.com/KernelSU-Next/KernelSU-Next/releases)
+        - KSU原版管理器下载：[KernelSU](https://github.com/tiann/KernelSU/releases)
 
         ### ⏫ 更新内容
 
@@ -1019,8 +1019,7 @@ jobs:
 
         **刷写内核存在变砖风险。**
 
-        在刷入内核前，请务必使用 KernelFlasher 等工具备份：
-
+        在刷入内核前，请务必使用[KernelFlasher](https://github.com/capntrips/KernelFlasher)等工具备份：
         - boot
         - vendor_boot
         - init_boot
@@ -1030,7 +1029,7 @@ jobs:
         请确认设备 SoC、内核版本以及目标机型与当前刷包匹配后再进行刷写。
 
         ---
-        **Build by TomHjy**
+        **Build by CoolApk@TomHjy**
         **Qualcomm SM8750 Universal Kernel**
         EOF
 
