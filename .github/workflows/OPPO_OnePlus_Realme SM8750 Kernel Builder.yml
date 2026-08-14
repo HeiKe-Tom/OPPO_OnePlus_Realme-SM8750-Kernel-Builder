@@ -852,36 +852,248 @@ jobs:
         name: ${{ needs.build.outputs.ak3name }}
         path: ./release_zips
         skip-decompress: true
+        # ============================================================
+    # 🏷️ 02 · 生成发布信息
+    # ============================================================
     - name: 🏷️ 02 · 生成发布信息
-      run: "if [[ -n \"${{ inputs.kernel_suffix }}\" ]]; then\n  FULL_VERSION=${{ env.KERNEL_VERSION }}.${{ env.SUB_VERSION }}-${{ inputs.kernel_suffix }}\n  echo \"FULL_VERSION=$FULL_VERSION\"\
-        \ >> $GITHUB_ENV\n  export FULL_VERSION=$FULL_VERSION\nelse\n  FULL_VERSION=${{ env.KERNEL_VERSION }}.${{ env.SUB_VERSION }}-${{ env.KERNEL_NAME }}\n  echo \"FULL_VERSION=$FULL_VERSION\" >> $GITHUB_ENV\n\
-        \  export FULL_VERSION=$FULL_VERSION\nfi\nTIME=\"$(TZ='Asia/Shanghai' date +'%y%m%d%H%M%S')\"\nTIME_FORM=\"$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')\"\necho \"TIME=$TIME\" >> $GITHUB_ENV\n\
-        echo \"TIME_FORM=$TIME_FORM\" >> $GITHUB_ENV\nTAG_HEAD=\"OPPO-OPlus-Realme-build\"\necho \"TAG_HEAD=$TAG_HEAD\" >> $GITHUB_ENV\nif [[ ${{ inputs.ksu_type }} == \"sukisu\" ]]; then\n\
-        \  KSU_TYPENAME=\"SukiSU Ultra\"\nelif [[ ${{ inputs.ksu_type }} == \"resukisu\" ]]; then\n  KSU_TYPENAME=\"ReSukiSU\"\nelif [[ ${{ inputs.ksu_type }} == \"ksunext\" ]];\
-        \ then\n  KSU_TYPENAME=\"KernelSU Next\"\nelif [[ ${{ inputs.ksu_type }} == \"ksu\" ]]; then\n  KSU_TYPENAME=\"KSU\"\nelse\n  KSU_TYPENAME=\"无内置KSU\"\nfi\necho \"KSU_TYPENAME=$KSU_TYPENAME\"\
-        \ >> $GITHUB_ENV\n"
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # ========================================================
+        # 从 build Job 获取输出
+        # ========================================================
+        SUB_VERSION="${{ needs.build.outputs.sub_version }}"
+        TARGET="${{ needs.build.outputs.target }}"
+        TARGET_DEVICE="${{ needs.build.outputs.target_device }}"
+
+        # ========================================================
+        # 基础数据检查
+        # ========================================================
+        if [[ -z "$SUB_VERSION" ]]; then
+          echo "❌ 无法获取内核子版本号"
+          echo "❌ needs.build.outputs.sub_version 为空"
+          exit 1
+        fi
+
+        if [[ -z "$TARGET" ]]; then
+          echo "⚠️ 编译目标为空"
+          TARGET="未知"
+        fi
+
+        if [[ -z "$TARGET_DEVICE" ]]; then
+          echo "⚠️ 目标设备为空"
+          TARGET_DEVICE="未知"
+        fi
+
+        # ========================================================
+        # 生成完整内核版本
+        # ========================================================
+        if [[ -n "${{ inputs.kernel_suffix }}" ]]; then
+          FULL_VERSION="${KERNEL_VERSION}.${SUB_VERSION}-${{ inputs.kernel_suffix }}"
+        else
+          FULL_VERSION="${KERNEL_VERSION}.${SUB_VERSION}"
+        fi
+
+        # ========================================================
+        # 时间信息
+        # ========================================================
+        TIME="$(TZ='Asia/Shanghai' date +'%y%m%d%H%M%S')"
+        TIME_FORM="$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')"
+
+        # ========================================================
+        # Release 基础信息
+        # ========================================================
+        TAG_HEAD="OPPO-OPlus-Realme-build"
+
+        # ========================================================
+        # KSU 类型
+        # ========================================================
+        case "${{ inputs.ksu_type }}" in
+          sukisu)
+            KSU_TYPENAME="SukiSU Ultra"
+            ;;
+          resukisu)
+            KSU_TYPENAME="ReSukiSU"
+            ;;
+          ksunext)
+            KSU_TYPENAME="KernelSU Next"
+            ;;
+          ksu)
+            KSU_TYPENAME="KSU"
+            ;;
+          *)
+            KSU_TYPENAME="无内置KSU"
+            ;;
+        esac
+
+        # ========================================================
+        # 写入当前 Release Job 环境
+        # ========================================================
+        {
+          echo "SUB_VERSION=$SUB_VERSION"
+          echo "FULL_VERSION=$FULL_VERSION"
+          echo "TIME=$TIME"
+          echo "TIME_FORM=$TIME_FORM"
+          echo "TAG_HEAD=$TAG_HEAD"
+          echo "KSU_TYPENAME=$KSU_TYPENAME"
+          echo "TARGET=$TARGET"
+          echo "TARGET_DEVICE=$TARGET_DEVICE"
+        } >> "$GITHUB_ENV"
+
+        # ========================================================
+        # 控制台显示
+        # ========================================================
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🏷️ 发布版本信息"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📦 内核版本   : $FULL_VERSION"
+        echo "🎯 编译目标   : $TARGET"
+        echo "📱 目标设备   : $TARGET_DEVICE"
+        echo "🔐 KSU        : $KSU_TYPENAME"
+        echo "🕐 编译时间   : $TIME_FORM"
+        echo "🏷️ Release    : ${TAG_HEAD}-${FULL_VERSION}"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+
+
+    # ============================================================
+    # 🚀 03 · 创建 GitHub Release
+    # ============================================================
     - name: 🚀 03 · 创建 GitHub Release
       id: create_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: "cat << 'EOF' > release_notes.md\n### \U0001F4F1 欧加真 ${{ env.KSU_TYPENAME }} SM8750 通用内核 | 构建信息\n- 内核版本号: ${{ env.FULL_VERSION }}\n- 编译时间: ${{ env.TIME_FORM }}\n- 机型：欧加真骁龙8Elite通用 ${{ env.KERNEL_VERSION\
-        \ }}.${{ env.SUB_VERSION }} 内核（基于一加13国际版 ${{ env.KERNEL_VERSION }}.${{ env.SUB_VERSION }} 版官方OKI源码）\n- KSU分支：${{ env.KSU_TYPENAME }}\n- susfs支持：${{ inputs.susfs_enable }}\n- KPM支持 ：${{\
-        \ github.event.inputs.kpm_enable }}\n- LZ4支持：${{ inputs.lz4_enable }}\n- LZ4KD支持：${{ inputs.lz4kd_enable }}\n- 网络功能增强：${{ inputs.better_net }}\n- BBR/Brutal\
-        \ 等拥塞控制算法支持：${{ inputs.bbr_enable }}\n- Droidspaces 容器支持：${{ inputs.droidspaces_enable }}\n- ADIOS IO调度器支持：${{ inputs.adios_enable }}\n- Re-Kernel支持：${{ inputs.rekernel_enable\
-        \ }}\n- 内核级基带保护支持：${{ inputs.baseband_guard }}\n- ReSukiSU管理器下载：[ReSukiSU_CI](https://github.com/cctv18/ReSukiSU_CI/releases)\n- SukiSU Ultra管理器下载：[SukiSU-Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra/releases)\n\
-        - KernelSU Next管理器下载：[KernelSU-Next](https://github.com/KernelSU-Next/KernelSU-Next/releases)\n- KSU原版管理器下载：[KernelSU](https://github.com/tiann/KernelSU/releases)\n\n### ⏫️ 更新内容：\n- 更新${{ env.KSU_TYPENAME\
-        \ }}至最新版本（${{ needs.build.outputs.ksuver }}）\n- (预留)\n\n### \U0001F4CB 安装方法 | Installation Guide\n1. 若你的手机已经安装了第三方Recovery（如TWRP)，可下载对应机型的AnyKernel刷机包后进入Recovery模式，通过Recovery刷入刷机包后重启设备；\n2. 若你的手机之前已有\
-        \ root 权限，可在手机上安装[HorizonKernelFlasher](https://github.com/libxzr/HorizonKernelFlasher/releases)，在HorizonKernelFlasher中刷入AnyKernel刷机包并重启；\n3. 若你之前已刷入SukiSU Ultra内核，且SukiSU Ultra管理器已更新至最新版本，可在SukiSU\
-        \ Ultra管理器中直接刷入AnyKernel刷机包并重启；\n4. 刷入无lz4kd补丁版的内核前若刷入过lz4kd补丁版的内核，为避免出错，请先关闭zram模块；\n5. 由于KernelSU上游更新了元模块功能，最新版KSU管理器（包括除KernelSU Next以外的各分支）需要配合元模块(metamodule)才能正常挂载模块。目前的元模块包括[meta overlayfs](https://github.com/KernelSU-Modules-Repo/meta-overlayfs),\
-        \ [mountify](https://github.com/backslashxx/mountify), [meta magicmount](https://github.com/7a72/meta-magic_mount/), [meta magicmount rs](https://github.com/Tools-cx-app/meta-magic_mount/), [hybrid\
-        \ mount](https://github.com/YuzakiKokuban/meta-hybrid_mount)等。若你是第一次使用KSU或刚从旧版KSU管理器升级至新版，请先安装一个元模块，这样其他涉及系统挂载的模块才能正常运行；\n6. KernelPatch Next（即KPN）是一个独立于KSU的KPM实现，可以运行在任意KSU/面具环境中（不适用于Apatch），且不能与(Re)SukiSU内置的kpm功能共同使用，使用前请保证你的内核没有内置的kpm实现/修补。\n\
-        \n#### ※※※刷写内核有风险，为防止出现意外导致手机变砖，在刷入内核前请务必用[KernelFlasher](https://github.com/capntrips/KernelFlasher)等软件备份boot等关键启动分区!※※※\nEOF\n\ngh release create \"${{ env.TAG_HEAD }}-${{ env.TIME }}\" \\\n \
-        \ --repo \"${{ github.repository }}\" \\\n  --title \"${{ env.TAG_HEAD }}-${{ env.FULL_VERSION }}\" \\\n  --notes-file release_notes.md \\\n  release_zips/AnyKernel3_*.zip\n"
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # ========================================================
+        # 生成 Release Notes
+        # ========================================================
+        cat > release_notes.md << EOF
+        ### 📱 欧加真 ${KSU_TYPENAME} SM8750 通用内核 | 构建信息
+
+        - **内核版本号**: ${FULL_VERSION}
+        - **编译时间**: ${TIME_FORM}
+        - **编译目标**: ${TARGET}
+        - **目标设备**: ${TARGET_DEVICE}
+        - **KSU分支**: ${KSU_TYPENAME}
+
+        ### 🧩 内核功能
+
+        - SUSFS支持：${{ inputs.susfs_enable }}
+        - KPM支持：${{ inputs.kpm_enable }}
+        - LZ4支持：${{ inputs.lz4_enable }}
+        - LZ4KD支持：${{ inputs.lz4kd_enable }}
+        - 网络功能增强：${{ inputs.better_net }}
+        - BBR/Brutal 等拥塞控制算法支持：${{ inputs.bbr_enable }}
+        - DroidSpaces 容器支持：${{ inputs.droidspaces_enable }}
+        - ADIOS IO调度器支持：${{ inputs.adios_enable }}
+        - Re-Kernel支持：${{ inputs.rekernel_enable }}
+        - 内核级基带保护支持：${{ inputs.baseband_guard }}
+
+        ### 🔐 KSU 管理器
+
+        - ReSukiSU 管理器
+        - SukiSU Ultra 管理器
+        - KernelSU Next 管理器
+        - KernelSU 原版管理器
+
+        ### ⏫ 更新内容
+
+        - 更新 ${KSU_TYPENAME} 至最新版本
+        - KSU版本：${{ needs.build.outputs.ksuver }}
+
+        ### 📋 安装方法 | Installation Guide
+
+        1. 若手机已经安装第三方 Recovery，可下载对应机型的 AnyKernel 刷机包，通过 Recovery 刷入后重启设备。
+        2. 若手机已经拥有 Root 权限，可使用 HorizonKernelFlasher 刷入 AnyKernel 刷机包。
+        3. 若已经使用 SukiSU Ultra，可通过管理器直接刷入 AnyKernel 刷机包。
+        4. 刷入无 LZ4KD 补丁版内核前，如果之前使用过 LZ4KD 补丁版内核，请先关闭 ZRAM 模块。
+        5. 使用新版 KernelSU 系列管理器时，请根据实际情况安装对应的 Meta Module。
+        6. KernelPatch Next（KPN）为独立的 KPM 实现，请勿与内置 KPM 同时使用。
+
+        ### ⚠️ 重要提示
+
+        **刷写内核存在变砖风险。**
+
+        在刷入内核前，请务必使用 KernelFlasher 等工具备份：
+
+        - boot
+        - vendor_boot
+        - init_boot
+        - dtbo
+        - vbmeta
+
+        请确认设备 SoC、内核版本以及目标机型与当前刷包匹配后再进行刷写。
+
+        ---
+        **Build by TomHjy**
+        **Qualcomm SM8750 Universal Kernel**
+        EOF
+
+        # ========================================================
+        # 创建 GitHub Release
+        # ========================================================
+        gh release create "${TAG_HEAD}-${TIME}" \
+          --repo "${GITHUB_REPOSITORY}" \
+          --title "${TAG_HEAD}-${FULL_VERSION}" \
+          --notes-file release_notes.md \
+          release_zips/AnyKernel3_*.zip
+
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "✅ GitHub Release 创建成功"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📦 版本：${FULL_VERSION}"
+        echo "🏷️ 标题：${TAG_HEAD}-${FULL_VERSION}"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+
+    # ============================================================
+    # 📊 04 · 生成发布摘要
+    # ============================================================
     - name: 📊 04 · 生成发布摘要
       if: always()
       shell: bash
-      run: "set -u\necho \"\"\necho \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"\necho \"\U0001F4CA 04 · 发布摘要\"\necho \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"\
-        \necho \"▶ 工作流：${GITHUB_WORKFLOW}\"\necho \"▶ 分支：${GITHUB_REF_NAME}\"\necho \"▶ 运行编号：${GITHUB_RUN_NUMBER}\"\necho \"▶ 提交：${GITHUB_SHA}\"\n{\n  echo \"## \U0001F680 发布任务摘要\"\n  echo \"\"\n  echo\
-        \ \"- 工作流：`${GITHUB_WORKFLOW}`\"\n  echo \"- 分支：`${GITHUB_REF_NAME}`\"\n  echo \"- 运行编号：`${GITHUB_RUN_NUMBER}`\"\n  echo \"- 提交：`${GITHUB_SHA}`\"\n} >> \"$GITHUB_STEP_SUMMARY\"\n"
-    timeout-minutes: 30
+      run: |
+        set -u
 
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📊 04 · 发布摘要"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "▶ 工作流     ：${GITHUB_WORKFLOW}"
+        echo "▶ 分支       ：${GITHUB_REF_NAME}"
+        echo "▶ 运行编号   ：${GITHUB_RUN_NUMBER}"
+        echo "▶ 内核版本   ：${FULL_VERSION:-未知}"
+        echo "▶ 编译目标   ：${TARGET:-未知}"
+        echo "▶ 目标设备   ：${TARGET_DEVICE:-未知}"
+        echo "▶ KSU        ：${KSU_TYPENAME:-未知}"
+        echo "▶ 编译时间   ：${TIME_FORM:-未知}"
+        echo "▶ 提交       ：${GITHUB_SHA}"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+        cat >> "$GITHUB_STEP_SUMMARY" << EOF
+
+        ## 🚀 发布任务摘要
+
+        | 项目 | 信息 |
+        | --- | --- |
+        | 📦 内核版本 | **${FULL_VERSION:-未知}** |
+        | 🎯 编译目标 | ${TARGET:-未知} |
+        | 📱 目标设备 | ${TARGET_DEVICE:-未知} |
+        | 🔐 KSU | ${KSU_TYPENAME:-未知} |
+        | 🕐 编译时间 | ${TIME_FORM:-未知} |
+        | 🏷️ Release | **${TAG_HEAD:-OPPO-OPlus-Realme-build}-${FULL_VERSION:-未知}** |
+        | 🌿 分支 | \`${GITHUB_REF_NAME}\` |
+        | 🔢 运行编号 | \`${GITHUB_RUN_NUMBER}\` |
+        | 📝 提交 | \`${GITHUB_SHA}\` |
+
+        ### ✅ 构建状态
+
+        Release Job 已完成版本信息生成、Release 创建以及构建摘要生成。
+        EOF
+    timeout-minutes: 30
