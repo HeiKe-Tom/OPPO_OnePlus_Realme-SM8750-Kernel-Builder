@@ -768,7 +768,7 @@ jobs:
           '
       - name: 📦 23 · 构建 AnyKernel3 刷机包
         id: create_zip
-        run: "cd kernel_workspace\ngit clone https://github.com/cctv18/AnyKernel3 --depth=1\nrm -rf ./AnyKernel3/.git\ncd AnyKernel3\ncp ../common/out/arch/arm64/boot/Image ./Image\nif [[ ! -f ./Image ]];\
+        run: "cd kernel_workspace\ngit clone https://github.com/HeiKe-Tom/AnyKernel3 --depth=1\nrm -rf ./AnyKernel3/.git\ncd AnyKernel3\ncp ../common/out/arch/arm64/boot/Image ./Image\nif [[ ! -f ./Image ]];\
           \ then\n  echo \"未找到内核镜像文件，构建可能出错\"\n  exit 1\nfi\nif [[ ${{ inputs.ksu_type }} == \"sukisu\" ]]; then\n  KSU_TYPENAME=\"SukiSU\"\nelif [[ ${{ inputs.ksu_type }} == \"\
           resukisu\" ]]; then\n  KSU_TYPENAME=\"ReSukiSU\"\nelif [[ ${{ inputs.ksu_type }} == \"ksunext\" ]]; then\n  KSU_TYPENAME=\"KSUNext\"\nelif [[ ${{ inputs.ksu_type }} ==\
           \ \"ksu\" ]]; then\n  KSU_TYPENAME=\"KSU\"\nelse\n  KSU_TYPENAME=\"none\"\nfi\nif [[ \"${{ inputs.lz4kd_enable }}\" == \"true\" ]]; then\n  wget https://raw.githubusercontent.com/$GITHUB_REPOSITORY/refs/heads/$GITHUB_REF_NAME/zram.zip\n\
@@ -802,12 +802,12 @@ jobs:
           name: ccache-debug-log
           path: ${{ github.workspace }}/kernel_workspace/ccache.log
           archive: true
-      - name: 📤 03 · 上传 ZIP 工件
+      - name: 📤 25 · 上传 ZIP 工件
         uses: actions/upload-artifact@v7
         with:
           path: ${{ github.workspace }}/kernel_workspace/AnyKernel*.zip
           archive: false
-      - name: 🩺 99 · 失败诊断
+      - name: 🩺 26 · 失败诊断
         if: failure()
         shell: bash
         run: "set +e\necho \"\"\necho \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"\necho \"\U0001FA7A 99 · 失败诊断\"\necho \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"\
