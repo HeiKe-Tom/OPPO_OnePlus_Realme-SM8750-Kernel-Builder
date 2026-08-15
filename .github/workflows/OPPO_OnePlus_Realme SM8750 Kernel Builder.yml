@@ -334,7 +334,7 @@ jobs:
           \nfi\n"
       - name: 🛡️ 08 · 应用 KernelSU / SUSFS 补丁
         if: inputs.susfs_enable
-        run: "cd kernel_workspace\nif [[ ${{ inputs.ksu_type }} != \"none\" ]]; then\n  echo \"正在添加susfs补丁...\"\n  git clone --depth=1 https://github.com/cctv18/susfs4oki.git susfs4ksu -b oki-${{\
+        run: "cd kernel_workspace\nif [[ ${{ inputs.ksu_type }} != \"none\" ]]; then\n  echo \"正在添加susfs补丁...\"\n  git clone --depth=1 https://github.com/HeiKe-Tom/susfs4oki.git susfs4ksu -b oki-${{\
           \ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}\n  wget https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/69_hide_stuff.patch -O ./common/69_hide_stuff.patch\n\
           \  cp ./susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch ./common/\n  cp ./susfs4ksu/kernel_patches/fs/* ./common/fs/\n  cp ./susfs4ksu/kernel_patches/include/linux/*\
           \ ./common/include/linux/\n  cd ./common\n  patch -p1 < 50_add_susfs_in_gki-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch || true\n  patch -p1 -N -F 3 < 69_hide_stuff.patch || true\n\
@@ -573,7 +573,7 @@ jobs:
 
           cd ./common
 
-          curl -sSL https://github.com/cctv18/Baseband-guard/raw/master/setup.sh | bash
+          curl -sSL https://github.com/HeiKe-Tom/Baseband-guard/raw/master/setup.sh | bash
 
           sed -i ''/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }'' security/Kconfig
 
@@ -774,7 +774,7 @@ jobs:
           \ then\n  echo \"未找到内核镜像文件，构建可能出错\"\n  exit 1\nfi\nif [[ ${{ inputs.ksu_type }} == \"sukisu\" ]]; then\n  KSU_TYPENAME=\"SukiSU\"\nelif [[ ${{ inputs.ksu_type }} == \"\
           resukisu\" ]]; then\n  KSU_TYPENAME=\"ReSukiSU\"\nelif [[ ${{ inputs.ksu_type }} == \"ksunext\" ]]; then\n  KSU_TYPENAME=\"KSUNext\"\nelif [[ ${{ inputs.ksu_type }} ==\
           \ \"ksu\" ]]; then\n  KSU_TYPENAME=\"KSU\"\nelse\n  KSU_TYPENAME=\"none\"\nfi\nif [[ \"${{ inputs.lz4kd_enable }}\" == \"true\" ]]; then\n  wget https://raw.githubusercontent.com/$GITHUB_REPOSITORY/refs/heads/$GITHUB_REF_NAME/zram.zip\n\
-          fi\nif [[ ${{ inputs.kpm_enable }} == 'true' ]]; then\n  wget https://github.com/cctv18/KPatch-Next/releases/latest/download/kpn.zip\nfi\nif [[ -n \"${{ inputs.kernel_suffix\
+          fi\nif [[ ${{ inputs.kpm_enable }} == 'true' ]]; then\n  wget https://raw.githubusercontent.com/HeiKe-Tom/oppo_oplus_realme_sm8750/refs/heads/main/KPatch-Next-Module-141.zip\nfi\nif [[ -n \"${{ inputs.kernel_suffix\
           \ }}\" ]]; then\n  AK3_NAME=AnyKernel3_${KSU_TYPENAME}_${{ env.KSUVER }}_${{ env.KERNEL_VERSION }}_${{ inputs.kernel_suffix }}.zip\nelse\n  AK3_NAME=AnyKernel3_${KSU_TYPENAME}_${{ env.KSUVER\
           \ }}_${{ env.KERNEL_VERSION }}_${{ env.KERNEL_NAME }}.zip\nfi\nzip -r ../$AK3_NAME ./*\necho \"ak3name=$AK3_NAME\" >> $GITHUB_OUTPUT\n\n#为AK3添加注释（调试信息）\nif [[ -n \"${{ inputs.kernel_suffix\
           \ }}\" ]]; then\n  FULL_VERSION=${{ env.KERNEL_VERSION }}.${{ env.SUB_VERSION }}-${{ inputs.kernel_suffix }}\nelse\n  FULL_VERSION=${{ env.KERNEL_VERSION }}.${{ env.SUB_VERSION }}-${{\
