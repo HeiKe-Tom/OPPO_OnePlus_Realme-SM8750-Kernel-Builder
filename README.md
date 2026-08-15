@@ -4,14 +4,29 @@
 
 **面向 OPPO / OnePlus / realme Qualcomm SM8750 平台的 6.6 系列内核自动化构建方案**
 
-[![GitHub Workflow](https://img.shields.io/github/actions/workflow/status/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/OPPO_OnePlus_RealMe%20SM8750%20Kernel%20Builder.yml?style=for-the-badge&logo=github-actions&logoColor=white&label=Build)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/OPPO_OnePlus_Realme%20SM8750%20Kernel%20Builder.yml?branch=main&style=for-the-badge&logo=github-actions&logoColor=white&label=Build)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/OPPO_OnePlus_Realme%20SM8750%20Kernel%20Builder.yml)
+[![Release](https://img.shields.io/github/v/release/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github&label=Latest%20Release)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/releases/latest)
+[![Kernel](https://img.shields.io/badge/Kernel-6.6.118-blue?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions)
 [![Stars](https://img.shields.io/github/stars/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/stargazers)
 [![Forks](https://img.shields.io/github/forks/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/network/members)
-[![License](https://img.shields.io/github/license/HeiKe-Tom/OPPO_OnePlus_RealMe-SM8750-Kernel-Builder?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/github/license/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge)](LICENSE)
 
-[🚀 在线编译](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions) · [💬 Issues](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/issues) · [📦 Releases](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/releases)
+[🚀 在线编译](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions) · [📦 最新 Release](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/releases/latest) · [💬 Issues](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/issues)
 
 </div>
+
+---
+
+## 📊 自动构建状态
+
+| Workflow | 状态 | 用途 |
+|---|---|---|
+| 🚀 **SM8750 Kernel Builder** | [![Build](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/OPPO_OnePlus_Realme%20SM8750%20Kernel%20Builder.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/OPPO_OnePlus_Realme%20SM8750%20Kernel%20Builder.yml) | 主内核自动编译 |
+| 🧪 **发布测试** | [![Release Test](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/build-test.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/build-test.yml) | 发布构建测试 |
+| 🧹 **仓库清理** | [![Clean](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/clean_workflow.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/clean_workflow.yml) | 清理工作流 |
+| 🗑️ **ccache 清理** | [![Cleaner](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/cleaner.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/cleaner.yml) | 清理全部 ccache |
+
+> 状态徽章均直接指向仓库当前实际存在的 GitHub Actions Workflow，不使用旧的 workflow 名称或路径。
 
 ---
 
@@ -21,122 +36,104 @@
 
 项目重点解决官方内核源码、Bazel 构建流程以及厂商定制代码带来的编译门槛，并将 KernelSU、SUSFS、KPM、LZ4/ZSTD、BBR、ADIOS、DroidSpaces、Re-Kernel、基带保护等功能整合到统一的 GitHub Actions 构建流程中。
 
-目前工作流提供多种内核版本和可选功能，适合用于：
+适用于：
 
 - 自定义 SM8750 / MT6991 内核
 - KernelSU / SUSFS 内核构建
 - OPPO / OnePlus / realme 内核移植与调试
 - GitHub Actions 云端自动编译
-- 内核功能模块化组合测试
-- 日常内核版本快速迭代
+- 内核功能组合测试
+- 内核版本快速迭代
 
-> **注意：** 本项目生成的内核属于第三方自定义内核。不同设备、ROM、Boot 版本以及厂商内核分支之间存在兼容性差异。刷入前请确认设备平台、内核版本、Boot 镜像结构以及回退方案。
+> **注意：** 第三方内核存在设备、ROM、Boot、DTB、vendor_dlkm、KMI/ABI 等兼容性差异。刷入前请确认平台与内核版本，并准备完整回退方案。
 
 ---
 
 ## ✨ 核心特性
 
-### 🧩 多内核版本
+### 🧩 支持的内核版本
 
-当前 GitHub Actions 工作流支持选择：
+当前主构建 Workflow 提供：
 
-| Kernel | 平台 / 来源定位 |
+| Kernel | 平台 / 目标 |
 |---|---|
-| `6.6.30` | SM8750 系列 |
-| `6.6.50` | MT6991 / 天玑平台 |
-| `6.6.56` | SM8750 系列 |
-| `6.6.57` | SM8750 系列 |
-| `6.6.66` | SM8750 系列 |
-| `6.6.89` | SM8750 系列，当前主要版本之一 |
-| `6.6.89 MTK` | MTK 分支目标 |
-| `6.6.118` | 新版 6.6 内核构建目标 |
+| `6.6.30` | SM8750 |
+| `6.6.50` | MT6991 / MTK |
+| `6.6.56` | SM8750 |
+| `6.6.57` | SM8750 |
+| `6.6.66` | SM8750 |
+| `6.6.89` | SM8750 |
+| `6.6.89 MTK` | MTK |
+| `6.6.118` | 6.6 新版构建目标 |
 
-> 实际可刷入性取决于设备 DTB/DTBO、vendor_dlkm、模块 ABI、厂商驱动以及 Boot 链路，不应仅依据内核版本号判断兼容性。
+**当前 README 标记的主版本：`6.6.118`。** 如果后续 Workflow 的默认目标发生变化，应同步更新顶部 Kernel Badge。
 
-### 🔐 KernelSU 多分支支持
+### 🔐 KernelSU
 
-工作流可选择：
+支持选择：
 
-- **ReSukiSU**
-- **SukiSU Ultra**（当前上游仓库已重定向至 ReSukiSU）
-- **KernelSU Next**
-- **原版 KernelSU**
-- **无 KernelSU**
+- ReSukiSU
+- SukiSU Ultra / ReSukiSU
+- KernelSU Next
+- 原版 KernelSU
+- 无 KernelSU
 
-### 🛡️ SUSFS
+### 🛡️ SUSFS / KPM
 
-可选集成 SUSFS，用于增强 KernelSU 环境下的隐藏、挂载以及相关内核能力。
+可选集成 SUSFS 与 KPM / KpatchNext，根据 Workflow 参数决定是否编译。
 
-### ⚡ KPM / KpatchNext
+### ⚡ LZ4 / ZSTD / LZ4KD
 
-可选集成 KPM，并使用独立的 KpatchNext 实现，使 KPM 不强依赖特定 KernelSU / Magisk 环境。
-
-### 🚀 LZ4 / ZSTD
-
-提供：
+支持：
 
 - LZ4 1.10.0
 - ZSTD 1.5.7
-- 对应内核补丁
-- 可选 LZ4KD 支持
-
-用于改善压缩相关能力，并为 zRAM 等场景提供更现代的算法支持。
+- LZ4KD
+- zRAM 相关补丁
 
 ### 🌐 网络功能
 
 可选：
 
 - BBR
-- 高级网络功能
+- TCP 拥塞控制算法
 - ipset
 - iptables 相关内核配置
-- 其他 TCP 拥塞控制算法
+- 高级网络功能
 
-BBR 默认并不强制开启为系统默认算法，是否启用应根据实际网络场景决定。
+### 💾 IO / 容器 / 功耗
 
-### 💾 IO 调度
+支持：
 
-集成 **ADIOS IO Scheduler**，可在工作流中直接选择是否启用。
+- ADIOS IO Scheduler
+- DroidSpaces
+- Re-Kernel
+- Freezer / NoActive 等配套场景
 
-### 📦 DroidSpaces
+### 🛡️ 基带保护
 
-提供 DroidSpaces 容器支持，并区分：
+可选启用内核级 Baseband Guard，用于降低错误操作或恶意程序对关键非用户分区进行破坏性写入的风险。
 
-- `false`：关闭
-- `standard`：基础容器 + `ntsync`
-- `extend`：额外测试支持
+> 基带保护不是完整的防砖方案。涉及 `modem`、`efs`、`persist`、`super`、`boot` 等关键分区时仍必须做好备份。
 
-### 🧊 Re-Kernel
+### 🚀 ccache
 
-可选启用 Re-Kernel，用于与 Freezer、NoActive 等工具配合实现更深层的应用冻结与功耗管理。
+针对 GitHub Actions 构建环境进行缓存与流程优化，支持：
 
-### 🛡️ 内核级基带保护
-
-工作流默认开启基带保护选项，用于降低恶意脚本或错误操作对关键非用户分区进行破坏性写入的风险。
-
-> 基带保护属于防护机制，不等同于完整的设备防砖方案。任何涉及 `modem`、`efs`、`persist`、`super`、`boot` 等关键分区的操作仍应提前做好完整备份。
-
-### 🚀 ccache / 编译优化
-
-项目使用缓存机制减少重复编译时间，并针对 GitHub Actions 环境进行构建流程优化。
-
-工作流同时支持：
-
+- ccache 复用
 - ccache 更新
 - ccache 调试日志
-- 自动缓存复用
-- 多版本构建参数
 - 自动化产物输出
 
 ---
 
-## 🏗️ 构建架构
+## 🏗️ 构建流程
 
 ```text
 GitHub Actions
       │
-      ├── 选择 Kernel 版本
-      ├── 选择 KernelSU 分支
+      ├── Kernel Target
+      ├── KernelSU
       ├── SUSFS / KPM
       ├── LZ4 / ZSTD / LZ4KD
       ├── BBR / Network
@@ -156,42 +153,37 @@ GitHub Actions
         Image / Modules
              │
              ▼
-       GitHub Actions Artifact
+       Release / Artifact
 ```
 
 ---
 
-## 🚀 GitHub Actions 使用方法
+## 🚀 GitHub Actions
 
-打开：
+进入：
 
-**Actions → OPPO_OnePlus_Realme SM8750 Kernel Builder → Run workflow**
+**Actions → 🚀 OPPO_OnePlus_Realme SM8750 Kernel Builder → Run workflow**
 
-然后根据需求选择参数。
+主 Workflow 当前支持以下关键参数：
 
-### 基础参数
-
-| 参数 | 说明 | 默认值 |
+| 参数 | 默认值 | 作用 |
 |---|---|---|
-| `kernel_target` | 内核版本 | `6.6.89` |
-| `ksu_type` | KernelSU 分支 | `resukisu` |
-| `susfs_enable` | SUSFS | `true` |
-| `kpm_enable` | KPM | `false` |
-| `lz4_enable` | LZ4/ZSTD 补丁 | `true` |
-| `lz4kd_enable` | LZ4KD | `false` |
-| `bbr_enable` | BBR 模式 | `false` |
-| `droidspaces_enable` | DroidSpaces | `false` |
-| `better_net` | 高级网络功能 | `false` |
-| `adios_enable` | ADIOS | `true` |
-| `rekernel_enable` | Re-Kernel | `false` |
-| `baseband_guard` | 基带保护 | `true` |
-| `ccache_update` | 更新 ccache | `false` |
-| `ccache_debug` | 上传 ccache 调试日志 | `false` |
-| `kernel_suffix` | 自定义内核版本后缀 | 默认 Android 15 内核标识 |
+| `kernel_target` | `6.6.89` | 选择内核版本 |
+| `ksu_type` | `resukisu` | 选择 KernelSU 分支 |
+| `susfs_enable` | `true` | SUSFS |
+| `kpm_enable` | `false` | KPM |
+| `lz4_enable` | `true` | LZ4/ZSTD |
+| `lz4kd_enable` | `false` | LZ4KD |
+| `bbr_enable` | `false` | BBR |
+| `droidspaces_enable` | `false` | DroidSpaces |
+| `better_net` | `false` | 高级网络功能 |
+| `adios_enable` | `true` | ADIOS |
+| `rekernel_enable` | `false` | Re-Kernel |
+| `baseband_guard` | `true` | 基带保护 |
+| `ccache_update` | `false` | 更新 ccache |
+| `ccache_debug` | `false` | ccache 调试 |
 
-### 推荐的 SM8750 日用配置
-
-如果目标是 **OnePlus / OPPO / realme SM8750 + Android 15/16 系列 ROM**，可以优先使用：
+### 推荐 SM8750 日用配置
 
 ```text
 Kernel       : 6.6.89
@@ -208,8 +200,6 @@ Re-Kernel    : OFF
 BasebandGuard: ON
 ```
 
-如果需要测试新内核代码，则可以进一步尝试 `6.6.118`，但应先确认对应设备的源码、DTB、模块 ABI 和启动链兼容性。
-
 ---
 
 ## 📱 平台支持
@@ -218,22 +208,22 @@ BasebandGuard: ON
 
 **SM8750 / Snapdragon 8 Elite**
 
-主要面向 OPPO / OnePlus / realme 采用 SM8750 的设备。
+主要面向采用 SM8750 的 OPPO / OnePlus / realme 设备。
 
 ### MediaTek
 
-项目同时保留 MT6991 / 相关 MTK 构建目标，但 **MTK 内核不能与 SM8750 内核混用**。
+仓库同时保留 MT6991 / MTK 构建目标。
 
-刷入前必须确认：
+> **SM8750 与 MT6991 不可交叉刷入。** 必须根据实际 SoC、Boot 链、DTB、vendor_dlkm 与厂商内核 ABI 判断兼容性。
 
-```text
-ro.soc.model
-ro.board.platform
+建议刷入前检查：
+
+```bash
+getprop ro.soc.model
+getprop ro.board.platform
 uname -a
 getprop ro.build.version.release
 ```
-
-以及实际 Boot / vendor_boot / dtbo / vendor_dlkm 结构。
 
 ---
 
@@ -247,44 +237,52 @@ getprop ro.build.version.release
 │       ├── build-test.yml
 │       ├── clean_workflow.yml
 │       └── cleaner.yml
-├── droidspaces_patch/       # DroidSpaces 相关补丁
-├── lib/                     # 构建脚本与公共函数
-├── local/                   # 本地构建相关内容
-├── other_patch/             # 其他内核补丁
-├── zram_patch/              # zRAM / 压缩算法相关补丁
-├── zram.zip                 # zRAM 相关构建资源
+├── droidspaces_patch/
+├── lib/
+├── local/
+├── other_patch/
+├── zram_patch/
+├── zram.zip
 └── README.md
 ```
 
 ---
 
+## 📦 Release
+
+GitHub Actions 会生成自动化 Release。
+
+最新 Release：
+
+[![Latest Release](https://img.shields.io/github/v/release/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/releases/latest)
+
+Release 中通常包含对应构建配置生成的 **AnyKernel3 ZIP** 等刷入产物。
+
+> Release 的具体内核版本、KernelSU 分支以及功能开关以该 Release 的构建说明为准，不应仅根据 README 顶部 Badge 判断具体刷包配置。
+
+---
+
 ## 🔧 本地构建
-
-项目核心逻辑同时面向本地 Shell 环境设计，但具体本地构建入口会随着工作流版本迭代调整。
-
-推荐优先使用 GitHub Actions：
 
 ```bash
 git clone https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder.git
 cd OPPO_OnePlus_Realme-SM8750-Kernel-Builder
 ```
 
-然后根据仓库当前 `local/` 与 `lib/` 中的脚本执行对应构建流程。
-
-> 不建议直接复制旧版本命令进行本地构建。内核版本、工具链、补丁以及环境依赖可能发生变化。
+具体本地构建入口以当前 `local/` 与 `lib/` 内容为准。推荐普通用户优先使用 GitHub Actions，以避免本地 LLVM、依赖包、ccache 与环境变量不一致造成构建问题。
 
 ---
 
 ## 🧪 构建产物检查
 
-刷入之前建议至少检查：
+刷入前建议检查：
 
 ```bash
 file Image
 strings Image | grep -E "Linux version|android"
 ```
 
-设备端可以检查：
+设备端：
 
 ```bash
 uname -a
@@ -293,48 +291,43 @@ getprop ro.build.version.release
 getprop ro.board.platform
 ```
 
-如果使用 KernelSU / SUSFS / KPM 等附加功能，还应确认对应功能是否实际编译进目标内核，而不是仅仅存在于构建参数中。
+如果启用了 KernelSU / SUSFS / KPM 等功能，还应确认目标功能实际进入最终 Image，而不是只有构建参数发生变化。
 
 ---
 
 ## ⚠️ 刷入前注意事项
 
-### 1. 必须确认平台
+### 1. 确认 SoC
 
 ```text
 SM8750 ≠ MT6991
 ```
 
-不要因为两个平台都属于高端 Android SoC，就尝试交叉刷入。
+不要跨平台刷入。
 
-### 2. 必须准备回退方案
+### 2. 准备回退方案
 
-建议至少保留：
+建议至少备份：
 
-- 原厂 `boot.img`
-- 原厂 `vendor_boot.img`
-- 原厂 `dtbo.img`
+- `boot.img`
+- `vendor_boot.img`
+- `init_boot.img`（设备存在时）
+- `dtbo.img`
+- `vbmeta.img`
 - 对应版本完整 OTA / 刷机包
-- 当前版本的 KernelSU / Magisk 恢复方案
 
-### 3. 不要盲目跨版本刷入
+### 3. 不要盲目跨 ROM / 跨 KMI
 
-即使两个 ROM 都是 Android 15 / Android 16，也可能存在：
+即使 Android 版本相同，也可能存在：
 
 - KMI 不一致
 - DTB 不一致
 - vendor_dlkm ABI 不一致
 - GKI ABI 不一致
 - 厂商驱动差异
-- boot header 差异
+- Boot Header 差异
 
-因此 **“同平台 + 同 Android 版本”不代表绝对兼容**。
-
-### 4. 基带保护不是万能防砖
-
-Baseband Guard 可以降低部分恶意或误操作导致的关键分区写入风险，但不能替代完整备份。
-
-涉及 EDL、fastboot、super、modem、NV、EFS 等操作时仍需谨慎。
+因此 **同平台 + 同 Android 版本 ≠ 绝对兼容**。
 
 ---
 
@@ -351,7 +344,7 @@ Baseband Guard 可以降低部分恶意或误操作导致的关键分区写入�
 - Toolchain 优化
 - KernelSU / SUSFS 适配
 
-提交 Issue 时请尽可能附带：
+Issue 建议附带：
 
 ```text
 设备型号：
@@ -362,17 +355,13 @@ Kernel：
 Boot 版本：
 KernelSU：
 SUSFS：
-失败的 Workflow：
+Workflow：
 完整错误日志：
 ```
-
-这样可以显著提高问题定位效率。
 
 ---
 
 ## 🙏 Credits
-
-本项目使用或参考了大量优秀的开源项目与社区工作：
 
 - [ReSukiSU](https://github.com/ReSukiSU/ReSukiSU)
 - [SukiSU Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra)
@@ -385,22 +374,22 @@ SUSFS：
 - [Mountify](https://github.com/backslashxx/mountify)
 - [Baseband Guard](https://github.com/vc-teahouse/Baseband-guard)
 
-同时感谢所有提供内核源码、设备树、补丁、测试反馈以及构建经验的开发者与用户。
+感谢所有提供源码、补丁、设备树、测试反馈与构建经验的开发者和用户。
 
 ---
 
 ## 📜 License
 
-本仓库中的构建脚本、补丁及其他内容请以各目录或文件中声明的许可证为准。
+本仓库中的构建脚本、补丁及其他内容以各目录或文件中声明的许可证为准。
 
-**第三方内核源码、补丁及工具链不自动继承本仓库的许可证。** 使用前请遵守对应上游项目的许可证及源码发布要求。
+第三方内核源码、补丁、工具链及项目不自动继承本仓库的许可证，请遵守对应上游项目的许可证与源码发布要求。
 
 ---
 
 <div align="center">
 
-### Built for Kernel Developers · OPPO / OnePlus / realme · SM8750 / 6.6
+**Built for Kernel Developers · OPPO / OnePlus / realme · SM8750 / 6.6**
 
-**如果这个项目对你有帮助，欢迎 ⭐ Star。**
+⭐ 如果这个项目对你有帮助，欢迎 Star。
 
 </div>
