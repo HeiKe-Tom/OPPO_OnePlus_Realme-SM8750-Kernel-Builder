@@ -1,63 +1,406 @@
-# 欧加真 SM8750/MT6991 系列通用6.6风驰移植内核自动化编译脚本
-[![STAR](https://img.shields.io/github/stars/cctv18/oppo_oplus_realme_sm8750?style=flat&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU%2BR2l0SHViPC90aXRsZT48cGF0aCBkPSJNMTIgLjI5N2MtNi42MyAwLTEyIDUuMzczLTEyIDEyIDAgNS4zMDMgMy40MzggOS44IDguMjA1IDExLjM4NS42LjExMy44Mi0uMjU4LjgyLS41NzcgMC0uMjg1LS4wMS0xLjA0LS4wMTUtMi4wNC0zLjMzOC43MjQtNC4wNDItMS42MS00LjA0Mi0xLjYxQzQuNDIyIDE4LjA3IDMuNjMzIDE3LjcgMy42MzMgMTcuN2MtMS4wODctLjc0NC4wODQtLjcyOS4wODQtLjcyOSAxLjIwNS4wODQgMS44MzggMS4yMzYgMS44MzggMS4yMzYgMS4wNyAxLjgzNSAyLjgwOSAxLjMwNSAzLjQ5NS45OTguMTA4LS43NzYuNDE3LTEuMzA1Ljc2LTEuNjA1LTIuNjY1LS4zLTUuNDY2LTEuMzMyLTUuNDY2LTUuOTMgMC0xLjMxLjQ2NS0yLjM4IDEuMjM1LTMuMjItLjEzNS0uMzAzLS41NC0xLjUyMy4xMDUtMy4xNzYgMCAwIDEuMDA1LS4zMjIgMy4zIDEuMjMuOTYtLjI2NyAxLjk4LS4zOTkgMy0uNDA1IDEuMDIuMDA2IDIuMDQuMTM4IDMgLjQwNSAyLjI4LTEuNTUyIDMuMjg1LTEuMjMgMy4yODUtMS4yMy42NDUgMS42NTMuMjQgMi44NzMuMTIgMy4xNzYuNzY1Ljg0IDEuMjMgMS45MSAxLjIzIDMuMjIgMCA0LjYxLTIuODA1IDUuNjI1LTUuNDc1IDUuOTIuNDIuMzYuODEgMS4wOTYuODEgMi4yMiAwIDEuNjA2LS4wMTUgMi44OTYtLjAxNSAzLjI4NiAwIC4zMTUuMjEuNjkuODI1LjU3QzIwLjU2NSAyMi4wOTIgMjQgMTcuNTkyIDI0IDEyLjI5N2MwLTYuNjI3LTUuMzczLTEyLTEyLTEyIiBmaWxsPSIjZmZmZmZmIj48L3BhdGg%2BPC9zdmc%2B)](https://github.com/cctv18/oppo_oplus_realme_sm8750/stargazers)
-[![FORK](https://img.shields.io/github/forks/cctv18/oppo_oplus_realme_sm8750?style=flat&logo=greasyfork&color=%2394E61A)](https://github.com/cctv18/oppo_oplus_realme_sm8750/forks)
-[![COOLAPK](https://img.shields.io/badge/cctv18_2-cctv18_2?style=flat&logo=android&logoColor=FF4500&label=%E9%85%B7%E5%AE%89&color=FF4500)](http://www.coolapk.com/u/22650293)
-[![DISCUSSION](https://img.shields.io/badge/%E8%AE%A8%E8%AE%BA%E5%8C%BA-discussions?logo=livechat&logoColor=FFBBFF&color=3399ff)](https://github.com/cctv18/oppo_oplus_realme_sm8750/discussions)
+# OPPO / OnePlus / realme SM8750 Kernel Builder
 
-<img alt="Endpoint Badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fcctv18%2Fkernel-workshop%2Frefs%2Fheads%2Fhotfix%2Fnotice.json">
-
-##### 
-一个更方便、快捷的自动化OPPO/一加/真我系列骁龙8Elite(SM8750)/天玑9400+(MT6991)机型的通用内核编译脚本。
-##### 
-这个项目的初衷是解决以下问题：
-- 绿厂官方摆烂，代码开源开一半，导致部分内核代码无法通过已有的配置xml正常编译，甚至没有编译配置xml；
-- 官方使用的 Bazel 编译器过于不稳定且低效，容易出现各种各样莫名其妙的错误，且全网几乎找不到任何有效解决方法，对于新手极不友好；
-- 由于绿厂魔改内核f2fs代码，导致欧加真机型刷入GKI内核后不清空data分区就无法正常开机。
-## 本项目的主要内容(及计划)
-- 提供 OKI（官方源码）/ GKI（谷歌通用内核源码）双编译模式，OKI保留官方驱动/调度，GKI兼容性更强（无需相同内核小版本即可刷入）；
-- 为 GKI 移植官方内核的f2fs源码，使 GKI 内核可以和官方 OKI 内核一样，刷入后可保留数据正常开机，不需要清空data ~~（新建文件夹）~~；
-- 改用 LLVM/Clang 18 进行编译，并排除了官方源码中不必要的 vendor 源码参与，大幅优化编译流程，对比原 bazel 编译器缩短了近2/3的编译时间（原版官方编译器每次约需要超过1h才能完成编译），提高了编译过程的稳定性，输出日志更便于维护调试；
-- 修复官方代码部分bug/未及时更新的补丁，并引入风驰内核驱动支持；
-- 提供 Github Action 在线编译/shell本地编译双版本脚本。
-## 已实现：
-- [x] 欧加真 SM8750 通用OKI内核（基于一加13源码的 6.6.30, 一加13t源码的 6.6.56, 一加Pad2Pro源码的 6.6.57, 一加13源码的 6.6.66 及一加13源码的 6.6.89，其他同内核版本非SM8750机型可自行测试，部分机型可完全兼容）
-- [x] 欧加真 MT6991 通用OKI内核（基于一加Ace5至尊版源码的 6.6.50 官方内核源码，其他同内核版本非MT6989机型可自行测试，部分机型可完全兼容）
-- [x] 欧加真 6.6 系列内核全面移植官方风驰scx调速器，在有官方风驰内核支持的机型上可实现完整原版风驰内核调度功能
-- [x] ReSukiSU/SukiSU Ultra/KernelSU Next/原版KernelSU多版本KSU可选
-- [x] 引入独家设计的 [ccache-ECS](https://github.com/cctv18/ccache-ECS) 缓存及大量编译流程优化，编译时间可稳定在约6min *(首次编译时会拉取公共预置ccache，从第二次开始没有大量配置改动的情况下，单次编译时间约6min；距离上一次调用两周未调用后缓存会被自动清除，此时编译会自动重建缓存)*
-- [x] 引入O2编译优化，改善内核运行性能
-- [x] ~~可选manual/kprobes/syscall钩子模式(kprobes钩子模式下支持切换至sus su模式)~~ 由于最新版KSU已更新inline hook，故旧版manual/syscall钩子已作废
-- [x] lz4 1.10.0 & zstd 1.5.7 算法更新&优化补丁(来自[@ferstar](https://github.com/ferstar), 移植by [@Xiaomichael](https://github.com/Xiaomichael), 6.6版本补丁重制by [@cctv18](https://github.com/cctv18))
-- [x] 可选加入 BBR/Brutal 及一系列 tcp 拥塞控制算法
-- [x] [ADIOS IO调度器](https://github.com/firelzrd/adios)移植
-- [x] 加入一些网络连接性能优化配置选项（用于为ipset及需要iptables等高级网络功能内核支持的程序提供支持）
-- [x] Droidspaces 容器化支持（比传统 Docker/LXC 更轻量化，便于移植的完整 Linux 环境容器实现）
-- [x] 添加了对[Mountify](https://github.com/backslashxx/mountify)模块的支持
-- [x] 加入Re:Kernel支持，与Freezer，NoActive等软件配合降低功耗
-- [x] 加入内核防格基带保护(By [@showdo](https://github.com/showdo))，有效防止恶意格机脚本/程序对系统分区数据的破坏
-## 待实现：
-- [ ] 欧加真 SM8750 通用GKI内核（移植一加f2fs源码，实现免清data刷入）
-- [ ] zram内置化，无需外置zram.ko挂载 ~~（有了新版 lz4&zstd 补丁真的还有必要吗）~~
-- [ ] Nethunter 网卡监听模式支持
-- [ ] kexec 内核热切换支持
-- 更多优化与特性移植……
-##### 
-##### 
-##### 
-## 鸣谢
-- ReSukiSU：[ReSukiSU/ReSukiSU](https://github.com/ReSukiSU/ReSukiSU)
-- SukiSU Ultra：[SukiSU-Ultra/SukiSU-Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra)
-- susfs4ksu：[ShirkNeko/susfs4ksu](https://github.com/ShirkNeko/susfs4ksu)
-- SukiSU内核补丁：[SukiSU-Ultra/SukiSU_patch](https://github.com/SukiSU-Ultra/SukiSU_patch)
-- pershoot维护的KernelSU Next分支：[pershoot/KernelSU-Next](https://github.com/pershoot/KernelSU-Next)
-- 手动钩子等补丁：[WildKernels/kernel_patches](https://github.com/WildKernels/kernel_patches)
-- 原版KernelSU: [tiann/KernelSU](https://github.com/tiann/KernelSU)
-- 内核防格基带保护模块：[vc-teahouse/Baseband-guard](https://github.com/vc-teahouse/Baseband-guard)
-- GKI 内核构建脚本：(待定)
-- ~~本地化内核构建脚本（已失效）：[Suxiaoqinx/kernel_manifest_OnePlus_Sukisu_Ultra](https://github.com/Suxiaoqinx/kernel_manifest_OnePlus_Sukisu_Ultra)~~
-
-<!-- 这是一个访客统计，用来看看我的项目主页有多少人访问过 -->
 <div align="center">
-  <img width="0" height="0" src="https://count.getloli.com/get/@:cctv18" />
+
+**面向 OPPO / OnePlus / realme Qualcomm SM8750 平台的 6.6 系列内核自动化构建方案**
+
+[![GitHub Workflow](https://img.shields.io/github/actions/workflow/status/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/OPPO_OnePlus_RealMe%20SM8750%20Kernel%20Builder.yml?style=for-the-badge&logo=github-actions&logoColor=white&label=Build)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions)
+[![Stars](https://img.shields.io/github/stars/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/stargazers)
+[![Forks](https://img.shields.io/github/forks/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/network/members)
+[![License](https://img.shields.io/github/license/HeiKe-Tom/OPPO_OnePlus_RealMe-SM8750-Kernel-Builder?style=for-the-badge)](LICENSE)
+
+[🚀 在线编译](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions) · [💬 Issues](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/issues) · [📦 Releases](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/releases)
+
 </div>
 
+---
+
+## 📖 项目简介
+
+这是一个针对 **OPPO / OnePlus / realme（欧加真）6.6 系列内核**设计的自动化 Kernel Builder。
+
+项目重点解决官方内核源码、Bazel 构建流程以及厂商定制代码带来的编译门槛，并将 KernelSU、SUSFS、KPM、LZ4/ZSTD、BBR、ADIOS、DroidSpaces、Re-Kernel、基带保护等功能整合到统一的 GitHub Actions 构建流程中。
+
+目前工作流提供多种内核版本和可选功能，适合用于：
+
+- 自定义 SM8750 / MT6991 内核
+- KernelSU / SUSFS 内核构建
+- OPPO / OnePlus / realme 内核移植与调试
+- GitHub Actions 云端自动编译
+- 内核功能模块化组合测试
+- 日常内核版本快速迭代
+
+> **注意：** 本项目生成的内核属于第三方自定义内核。不同设备、ROM、Boot 版本以及厂商内核分支之间存在兼容性差异。刷入前请确认设备平台、内核版本、Boot 镜像结构以及回退方案。
+
+---
+
+## ✨ 核心特性
+
+### 🧩 多内核版本
+
+当前 GitHub Actions 工作流支持选择：
+
+| Kernel | 平台 / 来源定位 |
+|---|---|
+| `6.6.30` | SM8750 系列 |
+| `6.6.50` | MT6991 / 天玑平台 |
+| `6.6.56` | SM8750 系列 |
+| `6.6.57` | SM8750 系列 |
+| `6.6.66` | SM8750 系列 |
+| `6.6.89` | SM8750 系列，当前主要版本之一 |
+| `6.6.89 MTK` | MTK 分支目标 |
+| `6.6.118` | 新版 6.6 内核构建目标 |
+
+> 实际可刷入性取决于设备 DTB/DTBO、vendor_dlkm、模块 ABI、厂商驱动以及 Boot 链路，不应仅依据内核版本号判断兼容性。
+
+### 🔐 KernelSU 多分支支持
+
+工作流可选择：
+
+- **ReSukiSU**
+- **SukiSU Ultra**（当前上游仓库已重定向至 ReSukiSU）
+- **KernelSU Next**
+- **原版 KernelSU**
+- **无 KernelSU**
+
+### 🛡️ SUSFS
+
+可选集成 SUSFS，用于增强 KernelSU 环境下的隐藏、挂载以及相关内核能力。
+
+### ⚡ KPM / KpatchNext
+
+可选集成 KPM，并使用独立的 KpatchNext 实现，使 KPM 不强依赖特定 KernelSU / Magisk 环境。
+
+### 🚀 LZ4 / ZSTD
+
+提供：
+
+- LZ4 1.10.0
+- ZSTD 1.5.7
+- 对应内核补丁
+- 可选 LZ4KD 支持
+
+用于改善压缩相关能力，并为 zRAM 等场景提供更现代的算法支持。
+
+### 🌐 网络功能
+
+可选：
+
+- BBR
+- 高级网络功能
+- ipset
+- iptables 相关内核配置
+- 其他 TCP 拥塞控制算法
+
+BBR 默认并不强制开启为系统默认算法，是否启用应根据实际网络场景决定。
+
+### 💾 IO 调度
+
+集成 **ADIOS IO Scheduler**，可在工作流中直接选择是否启用。
+
+### 📦 DroidSpaces
+
+提供 DroidSpaces 容器支持，并区分：
+
+- `false`：关闭
+- `standard`：基础容器 + `ntsync`
+- `extend`：额外测试支持
+
+### 🧊 Re-Kernel
+
+可选启用 Re-Kernel，用于与 Freezer、NoActive 等工具配合实现更深层的应用冻结与功耗管理。
+
+### 🛡️ 内核级基带保护
+
+工作流默认开启基带保护选项，用于降低恶意脚本或错误操作对关键非用户分区进行破坏性写入的风险。
+
+> 基带保护属于防护机制，不等同于完整的设备防砖方案。任何涉及 `modem`、`efs`、`persist`、`super`、`boot` 等关键分区的操作仍应提前做好完整备份。
+
+### 🚀 ccache / 编译优化
+
+项目使用缓存机制减少重复编译时间，并针对 GitHub Actions 环境进行构建流程优化。
+
+工作流同时支持：
+
+- ccache 更新
+- ccache 调试日志
+- 自动缓存复用
+- 多版本构建参数
+- 自动化产物输出
+
+---
+
+## 🏗️ 构建架构
+
+```text
+GitHub Actions
+      │
+      ├── 选择 Kernel 版本
+      ├── 选择 KernelSU 分支
+      ├── SUSFS / KPM
+      ├── LZ4 / ZSTD / LZ4KD
+      ├── BBR / Network
+      ├── ADIOS
+      ├── DroidSpaces
+      ├── Re-Kernel
+      ├── Baseband Guard
+      └── ccache
+             │
+             ▼
+      Kernel Source / Patches
+             │
+             ▼
+       LLVM / Clang Build
+             │
+             ▼
+        Image / Modules
+             │
+             ▼
+       GitHub Actions Artifact
+```
+
+---
+
+## 🚀 GitHub Actions 使用方法
+
+打开：
+
+**Actions → OPPO_OnePlus_Realme SM8750 Kernel Builder → Run workflow**
+
+然后根据需求选择参数。
+
+### 基础参数
+
+| 参数 | 说明 | 默认值 |
+|---|---|---|
+| `kernel_target` | 内核版本 | `6.6.89` |
+| `ksu_type` | KernelSU 分支 | `resukisu` |
+| `susfs_enable` | SUSFS | `true` |
+| `kpm_enable` | KPM | `false` |
+| `lz4_enable` | LZ4/ZSTD 补丁 | `true` |
+| `lz4kd_enable` | LZ4KD | `false` |
+| `bbr_enable` | BBR 模式 | `false` |
+| `droidspaces_enable` | DroidSpaces | `false` |
+| `better_net` | 高级网络功能 | `false` |
+| `adios_enable` | ADIOS | `true` |
+| `rekernel_enable` | Re-Kernel | `false` |
+| `baseband_guard` | 基带保护 | `true` |
+| `ccache_update` | 更新 ccache | `false` |
+| `ccache_debug` | 上传 ccache 调试日志 | `false` |
+| `kernel_suffix` | 自定义内核版本后缀 | 默认 Android 15 内核标识 |
+
+### 推荐的 SM8750 日用配置
+
+如果目标是 **OnePlus / OPPO / realme SM8750 + Android 15/16 系列 ROM**，可以优先使用：
+
+```text
+Kernel       : 6.6.89
+KernelSU     : ReSukiSU
+SUSFS        : ON
+KPM          : OFF
+LZ4/ZSTD     : ON
+LZ4KD        : OFF
+BBR          : OFF
+DroidSpaces  : OFF
+Better Net   : OFF
+ADIOS        : ON
+Re-Kernel    : OFF
+BasebandGuard: ON
+```
+
+如果需要测试新内核代码，则可以进一步尝试 `6.6.118`，但应先确认对应设备的源码、DTB、模块 ABI 和启动链兼容性。
+
+---
+
+## 📱 平台支持
+
+### Qualcomm
+
+**SM8750 / Snapdragon 8 Elite**
+
+主要面向 OPPO / OnePlus / realme 采用 SM8750 的设备。
+
+### MediaTek
+
+项目同时保留 MT6991 / 相关 MTK 构建目标，但 **MTK 内核不能与 SM8750 内核混用**。
+
+刷入前必须确认：
+
+```text
+ro.soc.model
+ro.board.platform
+uname -a
+getprop ro.build.version.release
+```
+
+以及实际 Boot / vendor_boot / dtbo / vendor_dlkm 结构。
+
+---
+
+## 📂 项目结构
+
+```text
+.
+├── .github/
+│   └── workflows/
+│       ├── OPPO_OnePlus_Realme SM8750 Kernel Builder.yml
+│       ├── build-test.yml
+│       ├── clean_workflow.yml
+│       └── cleaner.yml
+├── droidspaces_patch/       # DroidSpaces 相关补丁
+├── lib/                     # 构建脚本与公共函数
+├── local/                   # 本地构建相关内容
+├── other_patch/             # 其他内核补丁
+├── zram_patch/              # zRAM / 压缩算法相关补丁
+├── zram.zip                 # zRAM 相关构建资源
+└── README.md
+```
+
+---
+
+## 🔧 本地构建
+
+项目核心逻辑同时面向本地 Shell 环境设计，但具体本地构建入口会随着工作流版本迭代调整。
+
+推荐优先使用 GitHub Actions：
+
+```bash
+git clone https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder.git
+cd OPPO_OnePlus_Realme-SM8750-Kernel-Builder
+```
+
+然后根据仓库当前 `local/` 与 `lib/` 中的脚本执行对应构建流程。
+
+> 不建议直接复制旧版本命令进行本地构建。内核版本、工具链、补丁以及环境依赖可能发生变化。
+
+---
+
+## 🧪 构建产物检查
+
+刷入之前建议至少检查：
+
+```bash
+file Image
+strings Image | grep -E "Linux version|android"
+```
+
+设备端可以检查：
+
+```bash
+uname -a
+getprop ro.boot.slot_suffix
+getprop ro.build.version.release
+getprop ro.board.platform
+```
+
+如果使用 KernelSU / SUSFS / KPM 等附加功能，还应确认对应功能是否实际编译进目标内核，而不是仅仅存在于构建参数中。
+
+---
+
+## ⚠️ 刷入前注意事项
+
+### 1. 必须确认平台
+
+```text
+SM8750 ≠ MT6991
+```
+
+不要因为两个平台都属于高端 Android SoC，就尝试交叉刷入。
+
+### 2. 必须准备回退方案
+
+建议至少保留：
+
+- 原厂 `boot.img`
+- 原厂 `vendor_boot.img`
+- 原厂 `dtbo.img`
+- 对应版本完整 OTA / 刷机包
+- 当前版本的 KernelSU / Magisk 恢复方案
+
+### 3. 不要盲目跨版本刷入
+
+即使两个 ROM 都是 Android 15 / Android 16，也可能存在：
+
+- KMI 不一致
+- DTB 不一致
+- vendor_dlkm ABI 不一致
+- GKI ABI 不一致
+- 厂商驱动差异
+- boot header 差异
+
+因此 **“同平台 + 同 Android 版本”不代表绝对兼容**。
+
+### 4. 基带保护不是万能防砖
+
+Baseband Guard 可以降低部分恶意或误操作导致的关键分区写入风险，但不能替代完整备份。
+
+涉及 EDL、fastboot、super、modem、NV、EFS 等操作时仍需谨慎。
+
+---
+
+## 🛠️ 开发与贡献
+
+欢迎提交：
+
+- Bug Report
+- Kernel Build Failure
+- 新设备适配
+- 新内核版本适配
+- Patch
+- CI 优化
+- Toolchain 优化
+- KernelSU / SUSFS 适配
+
+提交 Issue 时请尽可能附带：
+
+```text
+设备型号：
+SoC：
+ROM：
+Android：
+Kernel：
+Boot 版本：
+KernelSU：
+SUSFS：
+失败的 Workflow：
+完整错误日志：
+```
+
+这样可以显著提高问题定位效率。
+
+---
+
+## 🙏 Credits
+
+本项目使用或参考了大量优秀的开源项目与社区工作：
+
+- [ReSukiSU](https://github.com/ReSukiSU/ReSukiSU)
+- [SukiSU Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra)
+- [susfs4ksu](https://github.com/ShirkNeko/susfs4ksu)
+- [SukiSU_patch](https://github.com/SukiSU-Ultra/SukiSU_patch)
+- [KernelSU Next](https://github.com/pershoot/KernelSU-Next)
+- [KernelSU](https://github.com/tiann/KernelSU)
+- [WildKernels/kernel_patches](https://github.com/WildKernels/kernel_patches)
+- [ADIOS](https://github.com/firelzrd/adios)
+- [Mountify](https://github.com/backslashxx/mountify)
+- [Baseband Guard](https://github.com/vc-teahouse/Baseband-guard)
+
+同时感谢所有提供内核源码、设备树、补丁、测试反馈以及构建经验的开发者与用户。
+
+---
+
+## 📜 License
+
+本仓库中的构建脚本、补丁及其他内容请以各目录或文件中声明的许可证为准。
+
+**第三方内核源码、补丁及工具链不自动继承本仓库的许可证。** 使用前请遵守对应上游项目的许可证及源码发布要求。
+
+---
+
+<div align="center">
+
+### Built for Kernel Developers · OPPO / OnePlus / realme · SM8750 / 6.6
+
+**如果这个项目对你有帮助，欢迎 ⭐ Star。**
+
+</div>
