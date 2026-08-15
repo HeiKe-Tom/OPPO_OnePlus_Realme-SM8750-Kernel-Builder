@@ -9,7 +9,7 @@
 [![Kernel](https://img.shields.io/badge/Kernel-6.6.118-blue?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions)
 [![Stars](https://img.shields.io/github/stars/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/stargazers)
 [![Forks](https://img.shields.io/github/forks/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge&logo=github)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/network/members)
-[![License](https://img.shields.io/github/license/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder?style=for-the-badge)](LICENSE)
+
 
 [🚀 在线编译](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions) · [📦 最新 Release](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/releases/latest) · [💬 Issues](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/issues)
 
