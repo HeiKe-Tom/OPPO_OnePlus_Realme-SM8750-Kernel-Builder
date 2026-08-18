@@ -22,7 +22,6 @@
 | Workflow | 状态 | 用途 |
 |---|---|---|
 | 🚀 **SM8750 Kernel Builder** | [![Build](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/OPPO_OnePlus_Realme%20SM8750%20Kernel%20Builder.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/OPPO_OnePlus_Realme%20SM8750%20Kernel%20Builder.yml) | 主内核自动编译 |
-| 🧪 **发布测试** | [![Release Test](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/build-test.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/build-test.yml) | 发布构建测试 |
 | 🧹 **仓库清理** | [![Clean](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/clean_workflow.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/clean_workflow.yml) | 清理工作流 |
 | 🗑️ **ccache 清理** | [![Cleaner](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/cleaner.yml/badge.svg?branch=main)](https://github.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/actions/workflows/cleaner.yml) | 清理全部 ccache |
 
