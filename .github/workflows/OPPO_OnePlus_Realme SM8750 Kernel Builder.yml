@@ -774,7 +774,7 @@ jobs:
           \ then\n  echo \"未找到内核镜像文件，构建可能出错\"\n  exit 1\nfi\nif [[ ${{ inputs.ksu_type }} == \"sukisu\" ]]; then\n  KSU_TYPENAME=\"SukiSU\"\nelif [[ ${{ inputs.ksu_type }} == \"\
           resukisu\" ]]; then\n  KSU_TYPENAME=\"ReSukiSU\"\nelif [[ ${{ inputs.ksu_type }} == \"ksunext\" ]]; then\n  KSU_TYPENAME=\"KSUNext\"\nelif [[ ${{ inputs.ksu_type }} ==\
           \ \"ksu\" ]]; then\n  KSU_TYPENAME=\"KSU\"\nelse\n  KSU_TYPENAME=\"none\"\nfi\nif [[ \"${{ inputs.lz4kd_enable }}\" == \"true\" ]]; then\n  wget https://raw.githubusercontent.com/$GITHUB_REPOSITORY/refs/heads/$GITHUB_REF_NAME/zram.zip\n\
-          fi\nif [[ ${{ inputs.kpm_enable }} == 'true' ]]; then\n  wget https://raw.githubusercontent.com/HeiKe-Tom/oppo_oplus_realme_sm8750/refs/heads/main/KPatch-Next-Module-141.zip\nfi\nif [[ -n \"${{ inputs.kernel_suffix\
+          fi\nif [[ ${{ inputs.kpm_enable }} == 'true' ]]; then\n  wget https://raw.githubusercontent.com/HeiKe-Tom/OPPO_OnePlus_Realme-SM8750-Kernel-Builder/refs/heads/main/kpn.zip\nfi\nif [[ -n \"${{ inputs.kernel_suffix\
           \ }}\" ]]; then\n  AK3_NAME=AnyKernel3_${KSU_TYPENAME}_${{ env.KSUVER }}_${{ env.KERNEL_VERSION }}_${{ inputs.kernel_suffix }}.zip\nelse\n  AK3_NAME=AnyKernel3_${KSU_TYPENAME}_${{ env.KSUVER\
           \ }}_${{ env.KERNEL_VERSION }}_${{ env.KERNEL_NAME }}.zip\nfi\nzip -r ../$AK3_NAME ./*\necho \"ak3name=$AK3_NAME\" >> $GITHUB_OUTPUT\n\n#为AK3添加注释（调试信息）\nif [[ -n \"${{ inputs.kernel_suffix\
           \ }}\" ]]; then\n  FULL_VERSION=${{ env.KERNEL_VERSION }}.${{ env.SUB_VERSION }}-${{ inputs.kernel_suffix }}\nelse\n  FULL_VERSION=${{ env.KERNEL_VERSION }}.${{ env.SUB_VERSION }}-${{\
