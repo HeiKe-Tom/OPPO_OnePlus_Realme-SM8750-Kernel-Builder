@@ -508,7 +508,7 @@ if [[ "$APPLY_LZ4KD" == "y" || "$APPLY_LZ4KD" == "Y" ]]; then
 fi
 
 if [[ "$USE_PATCH_LINUX" == [yY] ]]; then
-  wget https://raw.githubusercontent.com/HeiKe-Tom/oppo_oplus_realme_sm8750/refs/heads/main/KPatch-Next-Module-141.zip
+  wget https://raw.githubusercontent.com/HeiKe-Tom/oppo_oplus_realme_sm8750/refs/heads/main/kpn.zip
 fi
 
 # ===== 生成 ZIP 文件名 =====
